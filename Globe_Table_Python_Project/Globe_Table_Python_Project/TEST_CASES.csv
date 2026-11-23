@@ -1,0 +1,6 @@
+Test ID,Scenario,Expected Result
+TC-01,Register valid customer,Account created
+TC-02,Login with wrong password,Error shown and user remains logged out
+TC-03,Place order with valid details,Order saved and receipt displayed
+TC-04,Submit invalid phone number,Validation error and order not saved
+TC-05,Admin updates order status,New status saved and visible

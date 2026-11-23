@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Globe Table | A World of Flavours</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F3F1EA;--panel:#FFFFFF;--ink:#0E2A33;--mute:#5B7178;--line:#D9DED6;--acc:#E8A317;--ok:#1F9E7A;--bad:#D6454A;--deep:#0E2A33;--on-deep:#F3F1EA;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0A1A20;--panel:#112A33;--ink:#E7F0EC;--mute:#8FA8AF;--line:#1F3E49;--deep:#061217;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0A1A20;--panel:#112A33;--ink:#E7F0EC;--mute:#8FA8AF;--line:#1F3E49;--deep:#061217;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 'DM Sans',system-ui,sans-serif}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:-.025em;margin:0}
+a{color:inherit}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:.6rem 1.1rem;background:var(--ink);color:var(--bg);font-weight:500}
+button.go{background:var(--acc);color:#0E2A33;font-weight:700}
+button.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+input,select{font:inherit;width:100%;padding:.65rem .8rem;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+label{display:grid;gap:4px;font-size:14px;color:var(--mute)}
+header{position:sticky;top:0;z-index:20;background:var(--deep);color:var(--on-deep);display:flex;align-items:center;gap:18px;padding:12px max(18px,calc((100% - 1100px)/2));flex-wrap:wrap}
+header .logo{font:800 22px 'Bricolage Grotesque';color:var(--acc);text-decoration:none;margin-right:auto}
+header a.l{text-decoration:none;opacity:.75;padding:4px 2px;border-bottom:2px solid transparent}
+header a.l[aria-current="true"]{opacity:1;border-color:var(--acc)}
+#cartbtn{background:var(--acc);color:#0E2A33;font-weight:700}
+section.page{max-width:1100px;margin:0 auto;padding:36px 18px 60px;display:none}
+section.page.on{display:block}
+.hero{display:grid;grid-template-columns:1.3fr 1fr;gap:34px;align-items:center;padding:30px 0}
+@media(max-width:800px){.hero{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(40px,7vw,78px);line-height:.98;font-weight:800}
+.hero p{color:var(--mute);max-width:46ch;font-size:18px}
+.plate{aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 50%,#F6D58B 0 30%,#E8A317 31% 52%,#0E2A33 53% 56%,#F3F1EA 57% 100%);display:grid;place-items:center;font-size:clamp(70px,14vw,150px);box-shadow:0 30px 60px rgba(14,42,51,.25)}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;border-top:1px solid var(--line);margin-top:30px}
+.feat div{padding:20px 20px 20px 0}
+.feat h3{font-size:19px;margin-bottom:4px}.feat p{margin:0;color:var(--mute);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.dish{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:8px;align-content:space-between}
+.dish .e{font-size:44px}
+.veg{display:inline-block;width:12px;height:12px;border:2px solid var(--ok);border-radius:3px;position:relative;margin-right:6px;vertical-align:middle}
+.veg::after{content:"";position:absolute;inset:2px;background:var(--ok);border-radius:50%}
+.veg.n{border-color:var(--bad)}.veg.n::after{background:var(--bad)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 22px}
+.chips button{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.chips button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:800px){.two{grid-template-columns:1fr}}
+form.f{display:grid;gap:12px}
+#drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100%);background:var(--panel);z-index:30;padding:20px;overflow:auto;transform:translateX(105%);transition:transform .25s;border-left:1px solid var(--line);padding-top:max(20px,env(safe-area-inset-top,0px))}
+#drawer.on{transform:none}
+.q{display:inline-flex;align-items:center;gap:8px}.q button{padding:.2rem .7rem}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:18px 0}
+.steps div{text-align:center;font-size:13px;color:var(--mute);border-top:5px solid var(--line);padding-top:6px}
+.steps div.d{border-color:var(--acc);color:var(--ink);font-weight:700}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;background:var(--line)}
+.pill.ok{background:var(--ok);color:#fff}
+.t{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:12px;z-index:40;display:none}
+footer{background:var(--deep);color:var(--on-deep);padding:30px max(18px,calc((100% - 1100px)/2));display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+footer p{margin:2px 0;opacity:.8}
+.rev{font-size:17px;border-left:4px solid var(--acc);padding-left:14px;margin:0 0 18px}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--acc);color:#0E2A33;padding:12px 18px;border-radius:99px;font-weight:700;text-decoration:none;z-index:15;box-shadow:0 8px 20px rgba(0,0,0,.25)}details{border-bottom:1px solid var(--line);padding:12px 0}summary{cursor:pointer;font-weight:700}.off{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.off .card b{font:800 22px 'Bricolage Grotesque'}
+.search{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:14px}video.fv{width:100%;border-radius:14px;transform:scaleX(-1);display:none;margin-top:10px}
+
+/* Added customer and restaurant features */
+.feature-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:18px 0}
+.dash-stat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+.dash-stat strong{font:800 26px 'Bricolage Grotesque';display:block}
+.dish-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dish-actions button{padding:.45rem .75rem}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.gallery-tile{min-height:170px;border-radius:18px;background:linear-gradient(145deg,var(--panel),var(--line));border:1px solid var(--line);display:grid;place-items:center;text-align:center;padding:18px}
+.gallery-tile .food{font-size:58px}
+.muted{color:var(--mute)}
+@media(max-width:800px){header{gap:10px}header a.l{font-size:13px}}
+
+
+/* Globe Table redesign: editorial world-food look */
+:root{--bg:#faf5ec;--panel:#fffdf8;--ink:#24201c;--mute:#776d62;--line:#e8ddce;--acc:#d65a35;--ok:#27845d;--bad:#b83c35;--deep:#211d1a;--on-deep:#fff8ef;color-scheme:light}
+body{background:var(--bg);font-family:'DM Sans',system-ui,sans-serif}
+header{background:rgba(33,29,26,.97);backdrop-filter:blur(14px);padding:13px max(22px,calc((100% - 1200px)/2));box-shadow:0 8px 30px #211d1a18}
+header .logo{font-size:25px;letter-spacing:-1px;color:#f0a77d}
+header a.l{font-size:13px;opacity:.9}header a.l[aria-current="true"]{color:#f0a77d;border-color:#f0a77d}
+button{border-radius:999px;transition:transform .18s,box-shadow .18s}button:hover{transform:translateY(-1px);box-shadow:0 7px 18px #211d1a18}
+button.go,#cartbtn{background:var(--acc);color:white}
+button.alt{border-radius:999px}
+section.page{max-width:1200px;padding:48px 22px 76px}
+.hero{min-height:470px;grid-template-columns:1.1fr .9fr;gap:48px;padding:56px 0 46px}
+.hero h1{font-size:clamp(48px,7.4vw,88px);line-height:.92;max-width:700px}
+.hero h1:after{content:'✦';color:var(--acc);font-size:.42em;vertical-align:top;margin-left:10px}
+.hero p{font-size:18px;line-height:1.8;color:var(--mute);max-width:48ch}
+.plate{border-radius:34px;aspect-ratio:1.15;background:linear-gradient(140deg,#edc8a7,#c75c3d 56%,#4b2922);color:white;box-shadow:0 25px 65px #6d3c2c35;font-size:clamp(90px,14vw,165px);transform:rotate(2deg)}
+.feat{border-top:1px solid var(--line);margin-top:22px}.feat div{padding:24px 20px 20px 0}.feat h3{font-size:20px}
+.card,.dish,.dash-stat{border:1px solid var(--line);border-radius:22px;box-shadow:0 8px 28px #5a3b2410}
+.dish{padding:0 0 17px;overflow:hidden;gap:12px;transition:transform .2s,box-shadow .2s}.dish:hover{transform:translateY(-5px);box-shadow:0 18px 36px #5a3b2420}
+.dish>.e{height:150px;display:grid;place-items:center;font-size:76px;background:radial-gradient(circle at 50% 45%,#fff1d7,#f0d1ae 58%,#e9b98f);margin:0}
+.dish>div:not(.e){padding-left:17px;padding-right:17px}.dish .row{padding:0 17px}.dish-actions{padding:0 17px}
+.dish b{font-size:16px}.dish small{letter-spacing:.02em}
+.chips button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:white}
+#cu{max-width:420px;border-radius:999px;padding:12px 18px;background:var(--panel)}
+.search{margin-top:20px}.search input{border-radius:999px;padding:13px 18px}.search select{border-radius:999px}
+.gallery-tile{min-height:210px;border-radius:24px;background:linear-gradient(145deg,#fff7e8,#edc7a6);border:1px solid #e8cdb3;box-shadow:0 10px 25px #5a3b2410}.gallery-tile .food{font-size:72px}
+footer{background:#211d1a;padding-top:42px;padding-bottom:42px}
+#drawer{box-shadow:-18px 0 55px #211d1a20}
+.fab{background:var(--acc);color:#fff}
+#languageWelcome{position:fixed;inset:0;z-index:100;background:#211d1aeF;display:none;place-items:center;padding:20px}
+#languageWelcome.show{display:grid}
+#languageWelcome .welcome-card{width:min(520px,100%);background:#fffaf2;color:#28211c;border-radius:28px;padding:30px;box-shadow:0 30px 90px #0006}
+#languageWelcome h2{font-size:34px;margin:8px 0}.welcome-kicker{color:#b64d2d;font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px}
+#languageWelcome p{color:#786d61}#languageWelcome select{margin:12px 0 18px;border-radius:14px;padding:13px}
+.country-note{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.08em}
+@media(max-width:800px){.hero{min-height:0;padding:30px 0}.plate{aspect-ratio:1.3}.hero h1{font-size:clamp(44px,13vw,68px)}header{gap:8px}header a.l{font-size:12px}}
+
+#loginGate{position:fixed;inset:0;z-index:20000;background:linear-gradient(135deg,#211d1aee,#5a3429ee);display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto}#loginGate .gate-card{width:min(460px,100%);background:var(--panel);color:var(--ink);border-radius:26px;padding:30px;box-shadow:0 24px 80px #0005}#loginGate .gate-logo{font:800 32px 'Bricolage Grotesque';color:var(--acc);text-align:center}#loginGate .gate-sub{text-align:center;color:var(--mute);margin:4px 0 22px}body.login-locked{overflow:hidden}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+</head>
+<body class="login-locked">
+<div id="loginGate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+ <div class="gate-card"><div class="gate-logo">Globe Table</div><h2 id="gateTitle" style="text-align:center;margin-top:8px">Welcome! Please Login</h2><p class="gate-sub">Sign in or create an account to explore the menu and place your order.</p>
+ <form id="gateForm" class="f"><label>Full name<input id="gateName" required autocomplete="name" placeholder="Enter your full name"></label><label>Email address<input id="gateEmail" type="email" required autocomplete="email" placeholder="you@example.com"></label><label>Password<input id="gatePassword" type="password" minlength="4" required autocomplete="current-password" placeholder="Enter at least 4 characters"><span style="display:flex;align-items:center;gap:8px;margin-top:7px;font-size:13px"><input id="toggleGatePassword" type="checkbox" style="width:auto"> Show password</span></label><button class="go" type="submit">Login / Create Account</button></form>
+ <p id="gateMessage" class="muted" style="text-align:center;margin:14px 0 0">Your account is a local website demo. Do not use a real password.</p>
+ </div>
+</div>
+<header>
+ <a class="logo" href="#home">Globe Table</a>
+ <a class="l" href="#home">Home</a><a class="l" href="#menu">Menu</a><a class="l" href="#reserve">Reserve</a><a class="l" href="#party">Parties</a><a class="l" href="#track">Track</a><a class="l" href="#myorders">My Orders</a><a class="l" href="#account">Account</a><a class="l" href="#dietplans">Diet Plans</a><a class="l" href="#wishlist">Wishlist</a><a class="l" href="#gallery">Gallery</a><a class="l" href="#kitchen">Kitchen</a><a class="l" href="#contact">Contact</a><a class="l" href="#admin">Admin</a>
+ <select id="lg" aria-label="Language" style="width:auto;padding:.4rem .6rem"><option value="en">English</option><option value="te" selected>తెలుగు</option><option value="hi">हिन्दी</option><option value="ta">தமிழ்</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="bn">বাংলা</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="pt">Português</option><option value="it">Italiano</option><option value="ru">Русский</option><option value="ar">العربية</option><option value="zh">中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="id">Bahasa Indonesia</option><option value="mr">मराठी</option><option value="gu">ગુજરાતી</option><optgroup label="More (browser translates the page)"><option value="ur">اردو</option><option value="pa">ਪੰਜਾਬੀ</option><option value="or">ଓଡ଼ିଆ</option><option value="th">ไทย</option><option value="vi">Tiếng Việt</option><option value="pl">Polski</option><option value="nl">Nederlands</option><option value="sv">Svenska</option><option value="uk">Українська</option><option value="el">Ελληνικά</option><option value="he">עברית</option><option value="fa">فارسی</option><option value="ne">नेपाली</option><option value="si">සිංහල</option><option value="sw">Kiswahili</option><option value="ms">Bahasa Melayu</option><option value="ro">Română</option><option value="cs">Čeština</option><option value="hu">Magyar</option><option value="fi">Suomi</option><option value="da">Dansk</option><option value="bg">Български</option><option value="tl">Filipino</option></optgroup></select><button class="alt" id="th" style="color:inherit;border-color:rgba(255,255,255,.3)">Theme</button><button id="cartbtn">Cart (<span id="cc">0</span>)</button>
+</header>
+
+<section class="page" id="home">
+ <div class="hero"><div><h1>A world of flavour. One table.</h1><p>Travel across countries through food. Discover Indian comfort classics, Italian favourites, Chinese wok dishes, Korean street food and more — freshly prepared for your table.</p>
+ <div class="btns"><button class="go" onclick="location.hash='menu'">Order online</button><button class="alt" onclick="location.hash='reserve'">Reserve a table</button></div></div>
+ <div class="plate" role="img" aria-label="A selection of world cuisine">🍱</div></div>
+ <div class="feat">
+  <div><h3>Voice and face</h3><p>Regulars are welcomed by name when they walk in. Orders can be spoken in Telugu or English.</p></div>
+  <div><h3>Live tracking</h3><p>Follow your order from the kitchen to your door, step by step.</p></div>
+  <div><h3>Smart kitchen</h3><p>Sensors watch every fridge and tandoor, so food stays safe and fresh.</p></div>
+ </div>
+ <div class="two" style="margin-top:30px"><div class="card"><h3>Chef’s pick for you</h3><div class="f" style="margin-top:10px"><select id="pkd" aria-label="Diet"><option value="any">Any diet</option><option value="veg">Vegetarian</option><option value="non">Non-vegetarian</option></select><select id="pks" aria-label="Course"><option value="any">Any course</option><option>Starters</option><option>Mains</option><option>Rice</option><option>Sweets</option><option>Drinks</option></select><button class="go" id="pkb">Suggest dishes</button><div id="pkr"></div></div></div>
+<div class="card"><h3>Smart welcome</h3><p style="color:var(--mute);margin:6px 0">Regular guest? Let the camera greet you and bring up your usual order. This is a demo, so it greets a sample guest and keeps no photo.</p><button class="go" id="fs">Scan my face</button><video class="fv" id="fv" autoplay muted playsinline></video><p id="fm" style="margin:10px 0 0"></p></div></div>
+ <h2 style="margin:40px 0 16px">Offers this week</h2>
+ <div class="off"><div class="card"><b>Lunch combo ₹199</b><p style="margin:6px 0 0;color:var(--mute)">Meal, curry and buttermilk. 12 PM to 3 PM, weekdays.</p></div><div class="card"><b>Free sweet</b><p style="margin:6px 0 0;color:var(--mute)">A tiramisu or double ka meetha on dinner orders above ₹800.</p></div><div class="card"><b>Celebrate with us</b><p style="margin:6px 0 0;color:var(--mute)">Book a day ahead and we decorate your table for birthdays.</p></div></div>
+ <div class="two" style="margin-top:40px"><div><h2>Our kitchen story</h2></div><p style="margin:0;color:var(--mute);font-size:17px">Globe Table began with one idea: Guntur should be able to taste the whole world without leaving town. Our chefs cook Andhra, Indian, Italian, Chinese, Thai, Japanese, Mexican, Middle Eastern and many more cuisines, while sensors keep every fridge and tandoor at the right temperature, so each plate tastes the way it should.</p></div>
+ <h2 style="margin:40px 0 16px">What guests say</h2>
+ <p class="rev">The pad Thai and the butter chicken were both spot on, and the order arrived hot. – Aarav R.</p>
+ <p class="rev">Booked a table for our anniversary in seconds. They even had the dessert ready. – Meera N.</p><div id="newrev"></div>
+ <div class="two" style="margin-top:30px"><div class="card"><h3>Share your review</h3><form class="f" id="rvf" style="margin-top:10px"><input id="rvn" placeholder="Your name" required><input id="rvt" placeholder="What did you enjoy?" required><button class="go">Post review</button></form></div>
+ <div class="card"><h3>Get weekly offers</h3><form class="f" id="nlf" style="margin-top:10px"><input id="nle" type="email" placeholder="Your email" required><button class="go">Subscribe</button></form></div></div>
+ <h2 style="margin:40px 0 8px">Questions</h2>
+ <details><summary>Do you deliver across Guntur?</summary><p style="color:var(--mute)">Yes, within 8 km of Arundelpet. Delivery is free above ₹500.</p></details>
+ <details><summary>Is the food available without spice?</summary><p style="color:var(--mute)">Tell us when you order and the chef will adjust the heat.</p></details>
+ <details><summary>How is my face data used?</summary><p style="color:var(--mute)">Face welcome is optional and only works for guests who sign up at the restaurant. You can ask staff to delete your profile any time.</p></details>
+</section>
+
+<section class="page" id="menu">
+ <h2 style="font-size:40px">Explore the world menu</h2><p class="country-note">Choose a country to discover its signature dishes</p>
+ <p id="tb" style="display:none;background:var(--acc);color:#0E2A33;padding:8px 14px;border-radius:12px;font-weight:700;margin:12px 0 0"></p><div class="search"><input id="sq" type="search" placeholder="Search dishes or speak" aria-label="Search dishes"><select id="sl" aria-label="Voice language"><option value="te-IN">Telugu</option><option value="en-IN">English</option></select><button class="go" id="sv">Speak</button></div>
+ <select id="cu" aria-label="Cuisine" style="margin-top:12px;max-width:320px"></select><div class="chips" id="chips"></div><div class="grid" id="mgrid"></div>
+</section>
+
+<section class="page" id="reserve">
+ <div class="two"><div><h2 style="font-size:40px">Reserve a table</h2><p style="color:var(--mute)">We hold your table for 15 minutes. Parties over 8 can call us.</p></div>
+ <div class="card"><form class="f" id="rf">
+  <label>Your name<input id="rn" required></label><label>Phone<input id="rp" type="tel" required pattern="[0-9]{10}" placeholder="10 digits"></label>
+  <label>Date<input id="rd" type="date" required></label>
+  <label>Time<select id="rt"><option>12:30 PM</option><option>1:30 PM</option><option>7:00 PM</option><option>8:00 PM</option><option>9:00 PM</option></select></label>
+  <label>Guests<select id="rg"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select></label>
+  <button class="go">Confirm reservation</button></form><p id="rres" style="font-weight:700"></p></div></div>
+</section>
+
+<section class="page" id="party"><div class="two"><div><h2 style="font-size:40px">Private parties</h2><p style="color:var(--mute)">Birthdays, family functions and office lunches for 10 to 80 guests. Pick a package and see your estimate right away.</p></div>
+ <div class="card"><form class="f" id="pf"><label>Your name<input id="pn" required></label><label>Phone<input id="pp" type="tel" required pattern="[0-9]{10}" placeholder="10 digits"></label>
+ <label>Event<select id="pe"><option>Birthday</option><option>Family function</option><option>Office lunch</option><option>Anniversary</option></select></label>
+ <label>Date<input id="pd" type="date" required></label><label>Number of guests<input id="pg" type="number" min="10" max="80" value="20" required></label>
+ <label>Package<select id="pk"><option value="599">Silver · ₹599 per guest (veg starters, 2 mains, sweet)</option><option value="899">Gold · ₹899 per guest (starters, 3 mains, biryani, 2 sweets)</option><option value="1299">Platinum · ₹1299 per guest (live counters, prawns, world menu)</option></select></label>
+ <label><span><input class="px" type="checkbox" value="5000" style="width:auto"> Table decoration ₹5,000</span></label><label><span><input class="px" type="checkbox" value="1500" style="width:auto"> Cake ₹1,500</span></label><label><span><input class="px" type="checkbox" value="8000" style="width:auto"> Live music ₹8,000</span></label>
+ <p id="pest" class="tip" style="margin:0;border-left:4px solid var(--acc);padding-left:12px"></p><button class="go">Send enquiry</button></form><p id="pres" style="font-weight:700"></p></div></div></section>
+
+<section class="page" id="track">
+ <h2 style="font-size:40px">Track your order</h2><p style="color:var(--mute)">Place an order from the menu, then follow it here.</p>
+ <div class="card" id="tbox"><p>No order yet. <a href="#menu">Browse the menu</a>.</p></div>
+</section>
+
+<section class="page" id="admin">
+ <h2 style="font-size:40px">Admin</h2><p style="color:var(--mute)">Every order and booking from the website lands here.</p>
+ <div id="alogin" class="card" style="max-width:380px"><h3>Staff login</h3><p style="color:var(--mute)">Demo logins: manager / 1234 and chef / 5678.</p><form class="f" id="lf"><label>Staff ID<input id="li" required autocomplete="off"></label><label>PIN<input id="lp" type="password" required></label><button class="go">Log in</button></form><p id="lerr" style="color:var(--bad);margin:8px 0 0"></p></div>
+ <div id="abody" style="display:none"><div class="row" style="margin-bottom:14px"><span id="who" class="pill"></span><button class="alt" id="lo">Log out</button></div>
+ <div class="grid" id="astats" style="margin-bottom:20px"></div>
+ <div class="two"><div class="card"><h3>Orders</h3><div id="aord"></div></div><div class="card"><h3>Reservations</h3><div id="ares"></div></div></div>
+ <div class="two" style="margin-top:20px"><div class="card"><h3>Sales by order</h3><div id="achart"></div></div><div class="card"><h3>Menu manager</h3><div id="amenu" style="max-height:340px;overflow:auto"></div><form class="f" id="af" style="margin-top:12px"><input id="an" placeholder="New dish name" required><input id="ap2" type="number" min="1" placeholder="Price in ₹" required><button class="go">Add dish to menu</button></form></div></div>
+ <div class="card" style="margin-top:20px"><h3>Table QR codes</h3><p style="color:var(--mute)">Print one per table. Guests scan it and order from their seat.</p><div class="chips" id="qrt"></div><div id="qrbox" style="max-width:220px;background:#fff;padding:8px;border-radius:12px"></div><small id="qrl" style="color:var(--mute);word-break:break-all;display:block;margin-top:8px"></small><button class="alt" id="qrtry" style="margin-top:10px">Try ordering as this table</button></div>
+ <div class="two" style="margin-top:20px"><div class="card"><h3>Customer details</h3><div id="customerDirectory"></div></div><div class="card"><h3>Website login activity</h3><div id="loginActivity"></div></div></div><div class="card" style="margin-top:20px"><h3>Party enquiries</h3><div id="apar"></div></div></div>
+</section>
+
+
+<section class="page" id="account">
+ <div class="two"><div><h2 style="font-size:40px">Customer account</h2><p class="muted">Create an account or sign in to view your orders, saved dishes and loyalty points.</p><div class="card"><h3>Member benefits</h3><p>Earn 1 loyalty point for every ₹10 spent, save favourite dishes and keep your order history in one place.</p><p id="accountState" class="pill">Guest mode</p></div></div>
+ <div class="card"><div class="feature-head"><h3>Sign up / Login</h3><button class="alt" id="accountLogout" type="button">Log out</button></div><form class="f" id="accountForm"><label>Full name<input id="accountName" required autocomplete="name"></label><label>Email<input id="accountEmail" type="email" required autocomplete="email"></label><label>Password<input id="accountPassword" type="password" minlength="4" required autocomplete="new-password"></label><button class="go">Create account / Sign in</button></form><p id="accountMsg" class="muted" role="status">Demo account: details stay in this browser session only.</p></div></div>
+</section>
+<section class="page" id="myorders"><div class="feature-head"><div><h2 style="font-size:40px">My Orders</h2><p class="muted">Review previous orders and check the latest status.</p></div><a href="#menu">Order again</a></div><div id="myOrdersList" class="grid"></div></section>
+<section class="page" id="wishlist"><h2 style="font-size:40px">My Wishlist</h2><p class="muted">Your favourite dishes saved for later.</p><div id="wishlistItems" class="grid"></div></section>
+<section class="page" id="kitchen"><div class="feature-head"><div><h2 style="font-size:40px">Kitchen Dashboard</h2><p class="muted">Incoming orders and preparation status for kitchen staff.</p></div><span class="pill">Staff view</span></div><div id="kitchenOrders" class="grid"></div></section>
+<section class="page" id="gallery"><h2 style="font-size:40px">Food Gallery</h2><p class="muted">A taste of the cuisines served at Globe Table.</p><div class="gallery-grid">
+ <div class="gallery-tile"><span class="food">🍛</span><b>Indian favourites</b><span class="muted">Biryani, curries and thalis</span></div>
+ <div class="gallery-tile"><span class="food">🍕</span><b>Italian classics</b><span class="muted">Pizza, pasta and desserts</span></div>
+ <div class="gallery-tile"><span class="food">🥢</span><b>Chinese & Korean</b><span class="muted">Dim sum, Hakka noodles, tteokbokki and bibimbap</span></div>
+ <div class="gallery-tile"><span class="food">🍣</span><b>Japan & Thailand</b><span class="muted">Sushi, ramen, Pad Thai and green curry</span></div><div class="gallery-tile"><span class="food">🌮</span><b>Mexico</b><span class="muted">Tacos, nachos and burritos</span></div>
+ <div class="gallery-tile"><span class="food">🥙</span><b>Middle East & Türkiye</b><span class="muted">Hummus, falafel, shawarma and kebabs</span></div><div class="gallery-tile"><span class="food">🥘</span><b>Europe</b><span class="muted">French, Greek, Spanish and German favourites</span></div>
+ <div class="gallery-tile"><span class="food">🍰</span><b>Sweet endings</b><span class="muted">Desserts from around the world</span></div>
+ </div></section>
+<section class="page" id="dietplans">
+ <div class="feature-head"><div><h2 style="font-size:40px">Balanced Diet Plans</h2><p class="muted">Everyday meal ideas with variety and balance. Choose a plan that suits your preferences.</p></div><span class="pill">Food guide</span></div>
+ <div class="grid">
+  <div class="card"><div style="font-size:42px">🥗</div><h3>Vegetarian Balanced Plan</h3><p class="muted">A flexible mix of grains, pulses, vegetables, fruit and dairy or fortified alternatives.</p><b>Sample day</b><ul><li>Breakfast: Idli, sambar and fruit</li><li>Lunch: Rice, dal, vegetable curry and curd</li><li>Snack: Nuts or seasonal fruit</li><li>Dinner: Chapati, paneer/tofu and vegetables</li></ul></div>
+  <div class="card"><div style="font-size:42px">🍗</div><h3>Non-Vegetarian Balanced Plan</h3><p class="muted">Includes protein choices alongside vegetables, whole grains and fruit.</p><b>Sample day</b><ul><li>Breakfast: Vegetable dosa and sambar</li><li>Lunch: Rice, chicken/fish curry and vegetables</li><li>Snack: Yogurt and fruit</li><li>Dinner: Chapati, dal and egg or fish</li></ul></div>
+  <div class="card"><div style="font-size:42px">🌾</div><h3>High-Fibre Meal Plan</h3><p class="muted">Focuses on whole grains, beans, vegetables, fruit and adequate fluids.</p><b>Sample day</b><ul><li>Breakfast: Oats with banana</li><li>Lunch: Brown rice, chana and greens</li><li>Snack: Guava or apple</li><li>Dinner: Millet roti, mixed vegetables and dal</li></ul></div>
+  <div class="card"><div style="font-size:42px">🥛</div><h3>Protein Variety Plan</h3><p class="muted">Spreads protein-rich foods across meals using plant and/or animal options.</p><b>Sample day</b><ul><li>Breakfast: Pesarattu and chutney</li><li>Lunch: Rice, rajma and vegetables</li><li>Snack: Milk/soy drink or roasted chana</li><li>Dinner: Paneer/tofu or fish with roti and salad</li></ul></div>
+ </div>
+ <div class="card" style="margin-top:18px"><b>Important:</b> These are general meal ideas, not medical or weight-loss prescriptions. Food needs differ by age, activity, allergies and health conditions. Ask a qualified dietitian or healthcare professional for individual advice, and do not skip meals or follow restrictive plans.</div>
+</section>
+<section class="page" id="contact"><h2 style="font-size:40px">Contact Us</h2><p class="muted">Visit or contact Globe Table, Arundelpet, Guntur.</p><div class="two">
+ <div class="card"><h3>Restaurant details</h3><p>📍 Arundelpet, Guntur, Andhra Pradesh, India</p><p>☎ +91 90000 00000</p><p>🕒 Daily, 12 PM to 11 PM</p><a href="https://www.google.com/maps/search/?api=1&query=Arundelpet%2C+Guntur" target="_blank" rel="noopener">Open location in Google Maps ↗</a><p class="muted">Replace sample contact details with verified restaurant information before publishing.</p></div>
+ <div class="card"><h3>Send a message</h3><form class="f" id="contactForm"><label>Your name<input required></label><label>Email<input type="email" required></label><label>Message<input required></label><button class="go">Send message</button></form><p id="contactMsg" class="muted"></p></div></div></section>
+
+<a class="fab" href="tel:+919000000000">Call us</a>
+<div id="languageWelcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+ <div class="welcome-card"><div class="welcome-kicker">Globe Table · World cuisine</div><h2 id="welcomeTitle">Welcome to a world of flavours.</h2><p>Choose your preferred language to explore our menu and place your order.</p>
+ <label for="welcomeLanguage">Select language</label><select id="welcomeLanguage"><option value="en">English</option><option value="te">తెలుగు</option><option value="hi">हिन्दी</option><option value="ta">தமிழ்</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="bn">বাংলা</option><option value="gu">ગુજરાતી</option><option value="mr">मराठी</option><option value="it">Italiano</option><option value="zh">中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="ar">العربية</option></select>
+ <button class="go" id="welcomeContinue" style="width:100%;padding:13px">Continue to website →</button></div></div>
+<aside id="drawer" aria-label="Your cart"></aside>
+<div class="t" id="toast" role="status"></div>
+<footer><div><h3 style="color:var(--acc)">Globe Table</h3><p>Arundelpet, Guntur</p></div><div><h3>Hours</h3><p>Daily, 12 PM to 11 PM</p></div><div><h3>Call</h3><p>+91 90000 00000</p></div></footer>
+
+<script>
+const $=s=>document.querySelector(s),fmt=n=>'₹'+n.toLocaleString('en-IN');
+const menu=`Gongura chicken|320|Mains|0|🍗|Andhra
+Guntur chilli prawns|420|Starters|0|🦐|Andhra
+Chilli chicken 65|260|Starters|0|🌶️|Andhra
+Pappu and avakaya meal|200|Mains|1|🍲|Andhra
+Pootharekulu|120|Sweets|1|🍬|Andhra
+Hyderabadi dum biryani|360|Rice|0|🍛|Hyderabadi
+Mutton haleem|300|Mains|0|🥣|Hyderabadi
+Double ka meetha|150|Sweets|1|🍮|Hyderabadi
+Paneer tikka|280|Starters|1|🧀|North Indian
+Butter chicken|340|Mains|0|🍗|North Indian
+Dal makhani|240|Mains|1|🍲|North Indian
+Garlic naan|60|Mains|1|🫓|North Indian
+Veg pulao|220|Rice|1|🍚|North Indian
+Gulab jamun|110|Sweets|1|🍩|North Indian
+Mango lassi|110|Drinks|1|🥭|North Indian
+Ghee podi dosa|140|Mains|1|🥞|South Indian
+Idli sambar|110|Mains|1|🍘|South Indian
+Kerala fish curry|380|Mains|0|🐟|South Indian
+Filter coffee|70|Drinks|1|☕|South Indian
+Buttermilk|60|Drinks|1|🥛|South Indian
+Veg Manchurian|220|Starters|1|🥡|Chinese
+Chicken dim sum|260|Starters|0|🥟|Chinese
+Hakka noodles|240|Mains|1|🍜|Chinese
+Kung pao chicken|320|Mains|0|🥡|Chinese
+Egg fried rice|200|Rice|0|🍳|Chinese
+Bruschetta|200|Starters|1|🍞|Italian
+Margherita pizza|380|Mains|1|🍕|Italian
+Spaghetti bolognese|380|Mains|0|🍝|Italian
+Penne alfredo|340|Mains|1|🍝|Italian
+Tiramisu|240|Sweets|1|🍰|Italian
+Cappuccino|130|Drinks|1|☕|Italian
+Veg tacos|240|Starters|1|🌮|Mexican
+Nachos with guacamole|220|Starters|1|🥑|Mexican
+Chicken burrito|320|Mains|0|🌯|Mexican
+Churros with chocolate|160|Sweets|1|🥨|Mexican
+Tom yum soup|280|Starters|0|🍲|Thai
+Pad Thai|340|Mains|0|🍜|Thai
+Thai green curry|360|Mains|1|🍛|Thai
+Mango sticky rice|200|Sweets|1|🥭|Thai
+Veg sushi roll|320|Starters|1|🍣|Japanese
+Salmon nigiri|520|Starters|0|🍣|Japanese
+Chicken ramen|400|Mains|0|🍜|Japanese
+Matcha ice cream|180|Sweets|1|🍵|Japanese
+Korean fried chicken|380|Starters|0|🍗|Korean
+Tteokbokki|260|Starters|1|🌶️|Korean
+Bibimbap|360|Rice|0|🍚|Korean
+Kimchi fried rice|300|Rice|0|🍚|Korean
+Hummus with pita|200|Starters|1|🫓|Middle Eastern
+Falafel wrap|220|Mains|1|🧆|Middle Eastern
+Chicken shawarma|260|Mains|0|🥙|Middle Eastern
+Baklava|180|Sweets|1|🍯|Middle Eastern
+Adana kebab|420|Mains|0|🍢|Turkish
+Turkish coffee|120|Drinks|1|☕|Turkish
+Turkish delight|150|Sweets|1|🍬|Turkish
+Greek salad|240|Starters|1|🥗|Greek
+Chicken souvlaki|340|Mains|0|🍢|Greek
+Moussaka|380|Mains|0|🍆|Greek
+French onion soup|260|Starters|1|🧅|French
+Ratatouille|300|Mains|1|🍆|French
+Crème brûlée|260|Sweets|1|🍮|French
+Butter croissant|120|Sweets|1|🥐|French
+Paella|480|Rice|0|🥘|Spanish
+Patatas bravas|200|Starters|1|🥔|Spanish
+Cheeseburger|320|Mains|0|🍔|American
+Buffalo wings|340|Starters|0|🍗|American
+Mac and cheese|260|Mains|1|🧀|American
+French fries|120|Starters|1|🍟|American
+Chocolate brownie|180|Sweets|1|🍫|American
+Fish and chips|400|Mains|0|🐟|British
+Sticky toffee pudding|240|Sweets|1|🍮|British
+Bratwurst with sauerkraut|380|Mains|0|🌭|German
+Apple strudel|220|Sweets|1|🍎|German
+Borscht|240|Starters|1|🥣|Russian
+Beef stroganoff|420|Mains|0|🥩|Russian
+Pho|340|Mains|0|🍜|Vietnamese
+Fresh spring rolls|220|Starters|1|🌯|Vietnamese
+Nasi goreng|300|Rice|0|🍛|Indonesian
+Chicken satay|280|Starters|0|🍢|Indonesian
+Doro wat with injera|400|Mains|0|🍲|Ethiopian
+Chicken tagine|420|Mains|0|🍲|Moroccan
+Vegetable couscous|260|Mains|1|🥘|Moroccan
+Feijoada|420|Mains|0|🥘|Brazilian
+Pão de queijo|160|Starters|1|🧀|Brazilian
+Jerk chicken|380|Mains|0|🍗|Caribbean
+Virgin mojito|150|Drinks|1|🍹|Caribbean`.split('\n').map(l=>{const[n,p,c,v,e,k]=l.split('|');return{n,p:+p,c,v:+v,e,k}});
+let cart={},orders=[],bookings=[],cat='All',oid=1000,mine=null;
+const stages=['Received','Cooking','On the way','Delivered'];
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.k);toast.k=setTimeout(()=>t.style.display='none',2600)}
+function route(){let h=(location.hash||'#home').slice(1);if(/^table-\d+$/.test(h)){tableNo=+h.slice(6);h='menu';const b=$('#tb');b.style.display='block';b.textContent='Ordering for table '+tableNo+'. Your food will be brought to your seat.'}const ok=['home','menu','reserve','party','track','admin','account','myorders','wishlist','kitchen','gallery','dietplans','contact'].includes(h)?h:'home';
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id===ok));
+ document.querySelectorAll('header .l').forEach(a=>a.setAttribute('aria-current',a.getAttribute('href')==='#'+ok));
+ if(ok==='track')drawTrack();if(ok==='admin')drawAdmin();if(ok==='myorders')drawMyOrders();if(ok==='wishlist')drawWishlist();if(ok==='kitchen')drawKitchen();scrollTo(0,0)}
+addEventListener('hashchange',route);
+function countryLabel(k){const map={'Andhra':'🇮🇳 India · Andhra Pradesh','Hyderabadi':'🇮🇳 India · Hyderabad','North Indian':'🇮🇳 India · North','South Indian':'🇮🇳 India · South','Chinese':'🇨🇳 China','Italian':'🇮🇹 Italy','Mexican':'🇲🇽 Mexico','Thai':'🇹🇭 Thailand','Japanese':'🇯🇵 Japan','Korean':'🇰🇷 South Korea','Middle Eastern':'🌍 Middle East','Turkish':'🇹🇷 Türkiye','Greek':'🇬🇷 Greece','French':'🇫🇷 France','Spanish':'🇪🇸 Spain','American':'🇺🇸 United States','British':'🇬🇧 United Kingdom','German':'🇩🇪 Germany','Russian':'🇷🇺 Russia','Vietnamese':'🇻🇳 Vietnam','Indonesian':'🇮🇩 Indonesia','Ethiopian':'🇪🇹 Ethiopia','Moroccan':'🇲🇦 Morocco','Brazilian':'🇧🇷 Brazil','Caribbean':'🏝️ Caribbean'};return map[k]||('🌎 '+k)}
+function drawMenu(){
+ const cats=['All',...new Set(menu.map(m=>m.c))];
+ $('#cu').innerHTML=['All',...new Set(menu.map(m=>m.k))].map(k=>`<option value="${k}" ${k===cu?'selected':''}>${k==='All'?'🌍 All countries & cuisines':countryLabel(k)}</option>`).join('');
+ $('#chips').innerHTML=cats.map(c=>`<button aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join('');
+ $('#mgrid').innerHTML=menu.map((m,i)=>({m,i})).filter(x=>(cat==='All'||x.m.c===cat)&&(cu==='All'||x.m.k===cu)&&(!q||x.m.n.toLowerCase().includes(q))).map(({m,i})=>`<div class="dish"><div class="e">${m.e}</div><div><b><span class="veg ${m.v?'':'n'}" title="${m.v?'Vegetarian':'Non-vegetarian'}"></span>${m.n}</b><br><small style="color:var(--mute)">${countryLabel(m.k)} · ${m.k} cuisine</small></div><div class="row"><b>${fmt(m.p)}</b></div><div class="dish-actions"><button class="go" data-a="${i}" ${m.off?'disabled':''}>${m.off?'Sold out':'Add to cart'}</button><button class="alt" data-wish="${i}">♡ Save</button></div></div>`).join('');
+}
+$('#chips').onclick=e=>{const b=e.target.closest('button');if(b){cat=b.dataset.c;drawMenu()}};
+let wishlist=[];
+$('#mgrid').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.wish!==undefined){const i=+b.dataset.wish;if(!wishlist.includes(i))wishlist.push(i);drawWishlist();toast(menu[i].n+' saved to wishlist');return}if(b.dataset.a!==undefined){cart[b.dataset.a]=(cart[b.dataset.a]||0)+1;drawCart();toast(menu[b.dataset.a].n+' added to cart')}};
+function total(){return Object.entries(cart).reduce((a,[i,q])=>a+menu[i].p*q,0)}
+function drawCart(){
+ $('#cc').textContent=Object.values(cart).reduce((a,b)=>a+b,0);
+ const t=total(),gst=Math.round(t*.05),dc=Math.round(t*disc),keys=Object.keys(cart);
+ $('#drawer').innerHTML=`<div class="row"><h2>Your cart</h2><button class="alt" id="close">Close</button></div>`+(keys.length?`
+ ${keys.map(i=>`<div class="row" style="margin:12px 0"><span>${menu[i].n}<br><small style="color:var(--mute)">${fmt(menu[i].p)}</small></span><span class="q"><button class="alt" data-m="${i}" aria-label="Remove one">−</button>${cart[i]}<button class="alt" data-p="${i}" aria-label="Add one">+</button></span></div>`).join('')}
+ <hr style="border:0;border-top:1px solid var(--line)"><div class="row"><span>Subtotal</span><span>${fmt(t)}</span></div><div class="row"><span>GST 5%</span><span>${fmt(gst)}</span></div>${dc?`<div class="row" style="color:var(--ok)"><span>Coupon GLOBE10</span><span>−${fmt(dc)}</span></div>`:''}<div class="row"><b>Total</b><b>${fmt(t+gst-dc)}</b></div>
+ <div class="row" style="margin-top:10px"><input id="cc2" placeholder="Coupon code (try GLOBE10)" aria-label="Coupon code"><button type="button" class="alt" id="ap">Apply</button></div>
+ <form class="f" id="cf" style="margin-top:16px"><h3 style="margin:8px 0 0">Customer details</h3><label>Full name<input id="cn" required autocomplete="name"></label><label>Phone number<input id="cp" type="tel" required pattern="[0-9]{10}" placeholder="10 digit mobile number"></label><label>Email address<input id="ce" type="email" required autocomplete="email"></label>${tableNo?'':'<label>Delivery address<input id="ca" required autocomplete="street-address"></label>'}
+ <label>City<input id="city" required value="Guntur"></label><label>PIN code<input id="pin" required inputmode="numeric" pattern="[0-9]{6}" placeholder="6 digit PIN code"></label>
+ <h3 style="margin:8px 0 0">Billing details</h3><label>Billing name<input id="billName" required></label><label>Billing address<input id="billAddr" required placeholder="House / street / area"></label><label>GSTIN (optional)<input id="gstin" placeholder="Optional GST number"></label>
+ <label>Spice level<select id="spice"><option>Mild</option><option selected>Medium</option><option>Hot</option></select></label><label>Extra toppings / instructions<input id="toppings" placeholder="Extra cheese, no onion, etc."></label><label>Payment method<select id="cy"><option>UPI (demo)</option><option>Debit / Credit Card (demo)</option><option>Net Banking (demo)</option><option>Cash on delivery</option></select></label><p style="color:var(--mute)">Online payment is a front-end demo. Connect a secure payment gateway before accepting real payments.</p><button class="go">Place order · ${fmt(t+gst-dc)}</button></form>`:'<p style="color:var(--mute)">Your cart is empty. Pick something from the menu.</p>');
+ if(customer){if($('#cn'))$('#cn').value=customer.name||'';if($('#ce'))$('#ce').value=customer.email||'';if($('#billName'))$('#billName').value=customer.name||'';}
+}
+$('#drawer').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.id==='close')$('#drawer').classList.remove('on');
+ if(b.id==='ap'){const c=$('#cc2').value.trim().toUpperCase();disc=c==='GLOBE10'?.1:0;toast(disc?'10% off applied':'That code is not valid');drawCart()}
+ if(b.dataset.p){cart[b.dataset.p]++;drawCart()}
+ if(b.dataset.m){if(--cart[b.dataset.m]<=0)delete cart[b.dataset.m];drawCart()}};
+$('#drawer').onsubmit=e=>{e.preventDefault();
+ if(!customer){openLoginGate();$('#gateMessage').textContent='Please login first. After login, return to your cart and click Place Order.';return}
+ const t=total(),dc=Math.round(t*disc),o={id:++oid,name:$('#cn').value.trim()||customer.name,phone:$('#cp').value,email:$('#ce').value.trim()||customer.email,city:$('#city').value,pin:$('#pin').value,billName:$('#billName').value,billAddr:$('#billAddr').value,gstin:$('#gstin').value,addr:tableNo?'Table '+tableNo+' (dine-in)':$('#ca').value,pay:$('#cy').value,spice:$('#spice').value,toppings:$('#toppings').value,items:Object.entries(cart).map(([i,q])=>q+' × '+menu[i].n),subtotal:t,gst:Math.round(t*.05),discount:dc,amt:t+Math.round(t*.05)-dc,st:0,createdAt:new Date().toISOString()};
+ orders.push(o);mine=o.id;cart={};disc=0;pts+=Math.floor(o.amt/10);drawCart();$('#drawer').classList.remove('on');location.hash='track';route();drawTrack();showOrderConfirmation(o);toast('Order #'+o.id+' placed. You have '+pts+' loyalty points')};
+
+function showOrderConfirmation(o){
+ const old=$('#orderSuccessModal');if(old)old.remove();
+ const receipt=`<div class="card" id="successReceipt" style="background:#fff;color:#172033;padding:18px;border:1px solid #dbe2ea">
+ <div style="text-align:center"><div style="font-size:34px">✓</div><h2 style="margin:4px 0">GLOBE TABLE</h2><b>ORDER PAYMENT RECEIPT</b><p>Order successfully placed</p></div>
+ <hr><p><b>Order / Receipt No:</b> GT-${o.id}<br><b>Date:</b> ${new Date(o.createdAt).toLocaleString()}</p>
+ <p><b>Customer:</b> ${o.name}<br><b>Phone:</b> ${o.phone||'-'}<br><b>Email:</b> ${o.email||'-'}<br><b>Billing name:</b> ${o.billName||o.name}<br><b>Billing address:</b> ${o.billAddr||o.addr}<br><b>GSTIN:</b> ${o.gstin||'Not provided'}</p>
+ <hr><p><b>Items</b><br>${o.items.join('<br>')}</p>
+ <div class="row"><span>Subtotal</span><b>${fmt(o.subtotal)}</b></div><div class="row"><span>GST (5%)</span><b>${fmt(o.gst)}</b></div><div class="row"><span>Discount</span><b>−${fmt(o.discount)}</b></div>
+ <div class="row" style="font-size:19px"><b>Grand Total</b><b>${fmt(o.amt)}</b></div><p><b>Payment method:</b> ${o.pay}</p><p style="text-align:center">Thank you for ordering with Globe Table!</p></div>`;
+ const modal=document.createElement('div');modal.id='orderSuccessModal';
+ modal.style.cssText='position:fixed;inset:0;z-index:10000;background:rgba(5,12,25,.78);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto';
+ modal.innerHTML=`<div style="background:var(--card,#fff);color:var(--ink,#172033);width:min(560px,100%);max-height:92vh;overflow:auto;border-radius:18px;padding:20px;box-shadow:0 20px 70px #0006">
+ <div style="text-align:center;margin-bottom:14px"><div style="font-size:42px;color:#16a34a">✓</div><h2 style="margin:4px 0">Order Placed Successfully!</h2><p style="margin:0;color:var(--mute)">Your order #${o.id} has been confirmed.</p></div>
+ ${receipt}<div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:14px"><button class="alt" id="successDownload">Download Bill Receipt</button><button class="alt" id="successPrint">Print Bill Receipt</button><button class="go" id="successDone">Continue</button></div></div>`;
+ document.body.appendChild(modal);
+}
+$('#cartbtn').onclick=()=>{drawCart();$('#drawer').classList.add('on')};
+function drawTrack(){
+ const o=orders.find(x=>x.id===mine);if(!o)return;
+ $('#tbox').innerHTML=`<div class="row"><h3>Order #${o.id}</h3><span class="pill ${o.st===3?'ok':''}">${stages[o.st]}</span></div>
+ <p style="color:var(--mute)">${o.items.join(', ')}<br>Customer: ${o.name} · ${o.phone||''} · ${o.email||''}<br>To ${o.addr} · ${o.pay} · ${fmt(o.amt)}<br>Spice: ${o.spice||'As selected'} · Instructions: ${o.toppings||'None'}</p><div class="card" id="receiptPreview" style="margin:14px 0;background:var(--bg)"><div class="row"><h3>GLOBE TABLE · PAYMENT RECEIPT</h3><span class="pill ok">Billing complete</span></div><p>Receipt No: GT-${o.id} · ${new Date(o.createdAt).toLocaleString()}</p><p><b>Customer:</b> ${o.name}<br><b>Phone:</b> ${o.phone||'-'} · <b>Email:</b> ${o.email||'-'}<br><b>Billing name:</b> ${o.billName||o.name}<br><b>Billing address:</b> ${o.billAddr||o.addr}<br><b>GSTIN:</b> ${o.gstin||'Not provided'}</p><hr><p>${o.items.join('<br>')}</p><div class="row"><span>Subtotal</span><b>${fmt(o.subtotal??o.amt)}</b></div><div class="row"><span>GST (5%)</span><b>${fmt(o.gst||0)}</b></div><div class="row"><span>Discount</span><b>−${fmt(o.discount||0)}</b></div><div class="row"><h3>Total paid / payable</h3><h3>${fmt(o.amt)}</h3></div><p>Payment method: ${o.pay}<br>Thank you for dining with us!</p></div><div class="btns"><button class="alt" id="invoiceBtn">Download receipt</button><button class="alt" id="printReceiptBtn">Print receipt</button><button class="go" id="waOrderBtn">WhatsApp notification</button></div><div class="card" style="margin-top:14px"><b>Rate your order</b><form id="orderRating" class="f"><select id="orderStars"><option value="5">★★★★★ - Excellent</option><option value="4">★★★★ - Very good</option><option value="3">★★★ - Good</option><option value="2">★★ - Fair</option><option value="1">★ - Needs improvement</option></select><input id="orderComment" placeholder="Share your feedback"><button class="go">Submit rating</button></form><p id="ratingMsg" class="muted"></p></div>
+ <div class="steps">${stages.map((s,i)=>`<div class="${i<=o.st?'d':''}">${s}</div>`).join('')}</div>
+ <p style="font-size:30px;margin:0">${['👨‍🍳','🔥','🛵','🏠'][o.st]}</p><p>${['We got your order.','Your food is on the stove.',(o.addr.startsWith('Table')?'Your waiter is bringing it to your table.':'Your rider is heading to you. About 12 minutes.'),'Delivered. Enjoy your meal!'][o.st]}</p>`;
+}
+$('#rd').min=new Date().toISOString().slice(0,10);
+$('#rf').onsubmit=e=>{e.preventDefault();
+ const g=+$('#rg').value,tb=(bookings.length%8)+1,code='LT'+Math.floor(1000+Math.random()*9000);
+ bookings.push({name:$('#rn').value,date:$('#rd').value,time:$('#rt').value,g,tb,code});
+ $('#rres').textContent=`Booked. Table ${tb} for ${g} on ${$('#rd').value} at ${$('#rt').value}. Code ${code}.`;e.target.reset()};
+function adminExtra(){
+ $('#customerDirectory').innerHTML=Object.keys(customerAccounts).length?Object.entries(customerAccounts).map(([email,c])=>`<div style="padding:8px 0;border-bottom:1px solid var(--line)"><b>${c.name}</b><br><small>${email} · Joined ${c.createdAt?new Date(c.createdAt).toLocaleDateString():'-'}</small></div>`).join(''):'<p class="muted">No registered customers yet.</p>';
+ $('#loginActivity').innerHTML=loginEvents.length?loginEvents.slice().reverse().map(v=>`<div style="padding:8px 0;border-bottom:1px solid var(--line)"><b>${v.name}</b> · ${v.action}<br><small>${v.email} · ${v.when}</small></div>`).join(''):'<p class="muted">No website account logins recorded yet.</p>';
+ $('#apar').innerHTML=parties.map(p=>`<div style="margin:10px 0"><b>${p.ref} · ${p.name}</b> · ${p.ev}<br><small style="color:var(--mute)">${p.date}, ${p.g} guests, ${p.pkg}, estimate ${fmt(p.est)}, phone ${p.ph}</small></div>`).join('')||'<p style="color:var(--mute)">No party enquiries yet.</p>';
+ if(!$('#qrbox').innerHTML)qrDraw(qrN);
+ const l=orders.slice(-8),mx=Math.max(1,...l.map(o=>o.amt));
+ $('#achart').innerHTML=l.length?`<svg viewBox="0 0 320 150" width="100%" role="img" aria-label="Order values">${l.map((o,i)=>`<rect x="${10+i*38}" y="${120-o.amt/mx*100}" width="28" height="${o.amt/mx*100}" rx="6" fill="var(--acc)"/><text x="${24+i*38}" y="140" text-anchor="middle" font-size="10" fill="currentColor">#${o.id}</text>`).join('')}</svg>`:'<p style="color:var(--mute)">Place an order to see the chart.</p>';
+ $('#amenu').innerHTML=menu.map((m,i)=>`<div class="row" style="margin:8px 0"><span>${m.e} ${m.n} <small style="color:var(--mute)">${fmt(m.p)}</small></span><button class="${m.off?'go':'alt'}" data-o="${i}">${m.off?'Back in stock':'Mark sold out'}</button></div>`).join('');
+}
+function drawAdmin(){const on=!!staff;$('#alogin').style.display=on?'none':'block';$('#abody').style.display=on?'block':'none';if(!on)return;$('#who').textContent=staff.id+' · '+staff.role;const m=staff.role==='manager';[$('#achart').parentElement.parentElement,$('#qrbox').parentElement,$('#astats'),$('#ares').parentElement,$('#apar').parentElement].forEach(e=>e.style.display=m?'':'none');adminExtra();
+ const rev=orders.reduce((a,o)=>a+o.amt,0);
+ const now=new Date(),today=orders.filter(o=>new Date(o.createdAt||now).toDateString()===now.toDateString()).reduce((a,o)=>a+o.amt,0),month=orders.filter(o=>{const d=new Date(o.createdAt||now);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear()}).reduce((a,o)=>a+o.amt,0);
+  $('#astats').innerHTML=[[orders.length,'Orders'],[fmt(rev),'Total revenue'],[fmt(today),'Today sales'],[fmt(month),'This month'],[bookings.length,'Bookings'],[pts+' pts','Loyalty points issued']].map(s=>`<div class="card"><h2>${s[0]}</h2><small style="color:var(--mute)">${s[1]}</small></div>`).join('');
+ $('#aord').innerHTML=orders.map(o=>`<div class="row" style="margin:10px 0"><span><b>#${o.id} ${o.name}</b><br><small style="color:var(--mute)">${o.items.join(', ')}</small></span><button ${o.st>2?'disabled':''} data-n="${o.id}">${o.st>2?'Done':'Mark '+stages[o.st+1].toLowerCase()}</button></div>`).join('')||'<p style="color:var(--mute)">No orders yet. Place one from the menu.</p>';
+ $('#ares').innerHTML=bookings.map(b=>`<div style="margin:10px 0"><b>${b.name}</b> · Table ${b.tb}<br><small style="color:var(--mute)">${b.date}, ${b.time}, ${b.g} guests, code ${b.code}</small></div>`).join('')||'<p style="color:var(--mute)">No bookings yet.</p>';
+}
+$('#aord').onclick=e=>{const b=e.target.closest('[data-n]');if(b){const o=orders.find(x=>x.id==b.dataset.n);if(o.st<3)o.st++;drawAdmin()}};
+setInterval(()=>{const o=orders.find(x=>x.id===mine);if(o&&o.st<3&&Math.random()>.55){o.st++;if(location.hash==='#track')drawTrack();if(location.hash==='#admin')drawAdmin()}},6000);
+let cu='All',q='',disc=0,pts=0,tableNo=0,qrN=1,staff=null,lang='en',parties=[];
+const TE={'Home':'హోమ్','Menu':'మెనూ','Reserve':'బుక్ చేయండి','Parties':'పార్టీలు','Track order':'ఆర్డర్ ట్రాక్','Admin':'అడ్మిన్','The world on one table.':'ప్రపంచమంతా ఒకే టేబుల్‌పై.','Dishes from every corner of the world, cooked in one Guntur kitchen. Order in Telugu with your voice, book a table in ten seconds, and watch your food travel to you.':'ప్రపంచంలోని ప్రతి మూల నుండి వంటకాలు, ఒకే గుంటూరు వంటగదిలో. తెలుగులో వాయిస్‌తో ఆర్డర్ చేయండి, పది సెకన్లలో టేబుల్ బుక్ చేయండి, మీ భోజనం మీ దగ్గరికి రావడం చూడండి.','All cuisines':'అన్ని రకాల వంటకాలు','Order online':'ఆన్‌లైన్ ఆర్డర్','Reserve a table':'టేబుల్ బుక్ చేయండి','Add':'జోడించు','Sold out':'అయిపోయింది','All':'అన్నీ','Starters':'స్టార్టర్స్','Mains':'మెయిన్స్','Rice':'అన్నం','Sweets':'స్వీట్లు','Drinks':'పానీయాలు','Offers this week':'ఈ వారం ఆఫర్లు','Our kitchen story':'మా వంటగది కథ','What guests say':'అతిథుల మాట','Questions':'ప్రశ్నలు','Share your review':'మీ సమీక్ష రాయండి','Post review':'పోస్ట్ చేయండి','Subscribe':'సబ్‌స్క్రైబ్','Chef’s pick for you':'చెఫ్ సూచన','Suggest dishes':'వంటకాలు సూచించు','Smart welcome':'స్మార్ట్ స్వాగతం','Scan my face':'నా ముఖం స్కాన్','Call us':'కాల్ చేయండి','Your name':'మీ పేరు','Phone':'ఫోన్','Date':'తేదీ','Time':'సమయం','Guests':'అతిథులు','Number of guests':'అతిథుల సంఖ్య','Confirm reservation':'బుకింగ్ నిర్ధారించండి','Your cart':'మీ కార్ట్','Close':'మూసివేయి','Subtotal':'సబ్‌టోటల్','Total':'మొత్తం','Apply':'వర్తించు','Track your order':'మీ ఆర్డర్ ట్రాక్ చేయండి','Received':'అందింది','Cooking':'వండుతున్నాం','On the way':'దారిలో ఉంది','Delivered':'డెలివరీ అయింది','Orders':'ఆర్డర్లు','Reservations':'బుకింగ్‌లు','Private parties':'ప్రైవేట్ పార్టీలు','Send enquiry':'వివరాలు పంపండి','Staff login':'సిబ్బంది లాగిన్','Log in':'లాగిన్','Log out':'లాగౌట్','Hours':'సమయాలు'};
+const K=['Home','Menu','Reserve','Parties','Track order','Admin','The world on one table.','Order online','Reserve a table','Add','Sold out','Offers this week','What guests say','Your cart','Total','Track your order','Private parties','Log in','Call us','Confirm reservation'];
+const mk=a=>Object.fromEntries(K.map((k,i)=>[k,a[i]]));
+const L={te:TE,
+hi:mk(['होम','मेनू','बुकिंग','पार्टी','ऑर्डर ट्रैक','एडमिन','एक टेबल पर पूरी दुनिया।','ऑनलाइन ऑर्डर करें','टेबल बुक करें','जोड़ें','खत्म','इस हफ्ते के ऑफर','मेहमान क्या कहते हैं','आपकी कार्ट','कुल','अपना ऑर्डर ट्रैक करें','प्राइवेट पार्टी','लॉग इन','कॉल करें','बुकिंग पक्की करें']),
+ta:mk(['முகப்பு','மெனு','முன்பதிவு','விருந்துகள்','ஆர்டர் கண்காணிப்பு','நிர்வாகம்','ஒரே மேசையில் உலகம்.','ஆன்லைனில் ஆர்டர் செய்','மேசை முன்பதிவு செய்','சேர்','தீர்ந்துவிட்டது','இந்த வார சலுகைகள்','விருந்தினர்கள் கருத்து','உங்கள் கார்ட்','மொத்தம்','உங்கள் ஆர்டரை கண்காணிக்கவும்','தனிப்பட்ட விருந்துகள்','உள்நுழை','அழையுங்கள்','முன்பதிவை உறுதிசெய்']),
+kn:mk(['ಮುಖಪುಟ','ಮೆನು','ಬುಕ್ ಮಾಡಿ','ಪಾರ್ಟಿಗಳು','ಆರ್ಡರ್ ಟ್ರ್ಯಾಕ್','ಅಡ್ಮಿನ್','ಒಂದೇ ಟೇಬಲ್‌ನಲ್ಲಿ ಇಡೀ ಜಗತ್ತು.','ಆನ್‌ಲೈನ್ ಆರ್ಡರ್','ಟೇಬಲ್ ಬುಕ್ ಮಾಡಿ','ಸೇರಿಸಿ','ಖಾಲಿಯಾಗಿದೆ','ಈ ವಾರದ ಆಫರ್‌ಗಳು','ಅತಿಥಿಗಳ ಮಾತು','ನಿಮ್ಮ ಕಾರ್ಟ್','ಒಟ್ಟು','ನಿಮ್ಮ ಆರ್ಡರ್ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ','ಖಾಸಗಿ ಪಾರ್ಟಿಗಳು','ಲಾಗಿನ್','ಕರೆ ಮಾಡಿ','ಬುಕಿಂಗ್ ಖಚಿತಪಡಿಸಿ']),
+ml:mk(['ഹോം','മെനു','ബുക്ക് ചെയ്യുക','പാർട്ടികൾ','ഓർഡർ ട്രാക്ക്','അഡ്മിൻ','ഒരു ടേബിളിൽ ലോകം മുഴുവൻ.','ഓൻലൈൻ ഓർഡർ','ടേബിൾ ബുക്ക് ചെയ്യുക','ചേർക്കുക','തീർന്നു','ഈ ആഴ്ചയിലെ ഓഫറുകൾ','അതിഥികൾ പറയുന്നത്','നിങ്ങളുടെ കാർട്ട്','ആകെ','നിങ്ങളുടെ ഓർഡർ ട്രാക്ക് ചെയ്യുക','സ്വകാര്യ പാർട്ടികൾ','ലോഗിൻ','വിളിക്കൂ','ബുക്കിംഗ് ഉറപ്പിക്കുക']),
+bn:mk(['হোম','মেনু','বুকিং','পার্টি','অর্ডার ট্র্যাক','অ্যাডমিন','এক টেবিলে গোটা বিশ্ব।','অনলাইনে অর্ডার করুন','টেবিল বুক করুন','যোগ করুন','শেষ','এই সপ্তাহের অফার','অতিথিরা কী বলেন','আপনার কার্ট','মোট','আপনার অর্ডার ট্র্যাক করুন','প্রাইভেট পার্টি','লগ ইন','কল করুন','বুকিং নিশ্চিত করুন']),
+es:mk(['Inicio','Menú','Reservar','Fiestas','Seguir pedido','Admin','El mundo en una sola mesa.','Pedir en línea','Reservar una mesa','Añadir','Agotado','Ofertas de la semana','Lo que dicen los clientes','Tu carrito','Total','Sigue tu pedido','Fiestas privadas','Iniciar sesión','Llámanos','Confirmar reserva'])};
+const K2=['Home','Menu','Reserve','Order online','Add','Sold out','Your cart','Total','Log in','Call us'];
+const mk2=a=>Object.fromEntries(K2.map((k,i)=>[k,a[i]]));
+Object.assign(L,{
+fr:mk2(['Accueil','Menu','Réserver','Commander en ligne','Ajouter','Épuisé','Votre panier','Total','Connexion','Appelez-nous']),
+de:mk2(['Startseite','Speisekarte','Reservieren','Online bestellen','Hinzufügen','Ausverkauft','Ihr Warenkorb','Gesamt','Anmelden','Rufen Sie an']),
+pt:mk2(['Início','Cardápio','Reservar','Pedir online','Adicionar','Esgotado','Seu carrinho','Total','Entrar','Ligue para nós']),
+it:mk2(['Home','Menu','Prenota','Ordina online','Aggiungi','Esaurito','Il tuo carrello','Totale','Accedi','Chiamaci']),
+ru:mk2(['Главная','Меню','Бронь','Заказать онлайн','Добавить','Нет в наличии','Ваша корзина','Итого','Войти','Позвоните нам']),
+ar:mk2(['الرئيسية','القائمة','احجز','اطلب أونلاين','أضف','نفد','سلتك','المجموع','تسجيل الدخول','اتصل بنا']),
+zh:mk2(['首页','菜单','预订','在线点餐','添加','售罄','您的购物车','总计','登录','致电我们']),
+ja:mk2(['ホーム','メニュー','予約','オンライン注文','追加','売り切れ','カート','合計','ログイン','お電話']),
+ko:mk2(['홈','메뉴','예약','온라인 주문','추가','품절','장바구니','합계','로그인','전화하기']),
+id:mk2(['Beranda','Menu','Pesan tempat','Pesan online','Tambah','Habis','Keranjang Anda','Total','Masuk','Hubungi kami']),
+mr:mk2(['मुख्यपृष्ठ','मेनू','बुकिंग','ऑनलाइन ऑर्डर करा','जोडा','संपले','तुमची कार्ट','एकूण','लॉग इन','कॉल करा']),
+gu:mk2(['હોમ','મેનુ','બુકિંગ','ઓનલાઇન ઓર્ડર કરો','ઉમેરો','સમાપ્ત','તમારી કાર્ટ','કુલ','લોગ ઇન','કૉલ કરો'])});
+const cache={};
+async function autoTr(){
+ if(lang==='en'||L[lang])return;
+ if(!('Translator' in self)){if(!autoTr.w){autoTr.w=1;toast('Auto-translate needs a recent desktop Chrome. Showing English.')}return}
+ let tt;try{const av=await Translator.availability({sourceLanguage:'en',targetLanguage:lang});if(av==='unavailable'){toast('Your browser cannot translate to this language yet.');return}tt=await Translator.create({sourceLanguage:'en',targetLanguage:lang})}catch(e){toast('Translation could not start.');return}
+ const my=lang,w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),list=[];let n;
+ while(n=w.nextNode()){const p=n.parentElement;if(!p||/SCRIPT|STYLE|OPTION|TEXTAREA/.test(p.tagName)||p.closest('#lg'))continue;const s=n.nodeValue.trim();if(s.length<2||!/[A-Za-z]{2}/.test(s)||(n._o!==undefined&&n._l===lang))continue;list.push([n,s])}
+ for(const [x,s] of list){if(lang!==my)return;try{const k=my+'|'+s;cache[k]=cache[k]||await tt.translate(s);x._o=x.nodeValue;x._l=my;x.nodeValue=x.nodeValue.replace(s,cache[k])}catch(e){}}
+}
+function tr(){const D=L[lang]||{};const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){if(n._o!==undefined&&n._l!==lang){n.nodeValue=n._o;n._o=undefined}const s=n.nodeValue.trim();if(!s)continue;if(n._o===undefined&&D[s]){n._o=n.nodeValue;n._l=lang;n.nodeValue=n.nodeValue.replace(s,D[s])}}}
+new MutationObserver(()=>{if(lang==='en')return;if(L[lang])tr();else{clearTimeout(window._at);window._at=setTimeout(autoTr,300)}}).observe(document.body,{childList:true,subtree:true});
+function setLanguage(next){lang=next||'en';$('#lg').value=lang;document.documentElement.lang=lang;document.documentElement.dir=['ar','ur','he','fa'].includes(lang)?'rtl':'ltr';try{localStorage.setItem('globeTableLanguage',lang)}catch(e){}tr();autoTr()}
+$('#lg').onchange=e=>setLanguage(e.target.value);
+$('#welcomeContinue').onclick=()=>{setLanguage($('#welcomeLanguage').value);$('#languageWelcome').classList.remove('show');try{localStorage.setItem('globeTableLanguageChosen','1')}catch(e){}};
+const accts={manager:{pin:'1234',role:'manager'},chef:{pin:'5678',role:'chef'}};
+$('#lf').onsubmit=e=>{e.preventDefault();const id=$('#li').value.trim().toLowerCase(),a=accts[id];if(a&&a.pin===$('#lp').value){staff={id,role:a.role};$('#lerr').textContent='';e.target.reset();drawAdmin()}else $('#lerr').textContent='Wrong staff ID or PIN.'};
+$('#lo').onclick=()=>{staff=null;drawAdmin()};
+$('#pd').min=new Date().toISOString().slice(0,10);
+function pest(){const g=+$('#pg').value||0;let x=g*+$('#pk').value;document.querySelectorAll('.px:checked').forEach(c=>x+=+c.value);x=Math.round(x*1.05);$('#pest').textContent='Estimate with 5% GST: '+fmt(x)+'. Advance to confirm: '+fmt(Math.round(x*.25));return x}
+$('#pf').oninput=pest;pest();
+$('#pf').onsubmit=e=>{e.preventDefault();const est=pest(),ref='P'+Math.floor(100+Math.random()*900);parties.push({ref,name:$('#pn').value,ph:$('#pp').value,ev:$('#pe').value,date:$('#pd').value,g:+$('#pg').value,pkg:$('#pk').selectedOptions[0].textContent.split(' · ')[0],est});$('#pres').textContent='Enquiry sent. Reference '+ref+'. We will call you within 2 hours.';e.target.reset();pest()};
+function qrDraw(n){qrN=n;const u=location.href.split('#')[0]+'#table-'+n;try{const c=qrcode(0,'M');c.addData(u);c.make();$('#qrbox').innerHTML=c.createSvgTag({scale:5,margin:1})}catch(e){$('#qrbox').textContent='The QR library did not load.'}$('#qrl').textContent='Table '+n+': '+u;document.querySelectorAll('#qrt button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.q==n))}
+$('#qrt').innerHTML=[1,2,3,4,5,6,7,8].map(n=>`<button aria-pressed="false" data-q="${n}">Table ${n}</button>`).join('');
+$('#qrt').onclick=e=>{const b=e.target.closest('button');if(b)qrDraw(+b.dataset.q)};
+$('#qrtry').onclick=()=>{location.hash='table-'+qrN};
+const te={'బిర్యానీ':'biryani','దోశ':'dosa','కాఫీ':'coffee','చికెన్':'chicken','రొయ్యలు':'prawns'};
+$('#th').onclick=()=>{const r=document.documentElement;r.dataset.theme=getComputedStyle(r).colorScheme==='dark'?'light':'dark'};
+$('#sq').oninput=e=>{q=e.target.value.toLowerCase();drawMenu()};
+$('#sv').onclick=()=>{const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R){toast('Voice search needs Chrome');return}const r=new R();r.lang=$('#sl').value;r.onresult=e=>{let x=e.results[0][0].transcript;Object.keys(te).forEach(k=>{if(x.includes(k))x=te[k]});$('#sq').value=x;q=x.toLowerCase();drawMenu();toast('Heard: '+x)};r.onerror=()=>toast('Could not hear. Allow the microphone.');r.start();toast('Listening…')};
+$('#pkb').onclick=()=>{const v=$('#pkd').value,c=$('#pks').value;const l=menu.map((m,i)=>({m,i})).filter(x=>(v==='any'||(v==='veg')===!!x.m.v)&&(c==='any'||x.m.c===c)).slice(0,2);$('#pkr').innerHTML=l.length?l.map(x=>`<div class="row" style="margin:8px 0"><span>${x.m.e} <b>${x.m.n}</b> ${fmt(x.m.p)}</span><button class="go" data-k="${x.i}">Add</button></div>`).join(''):'Nothing matches. Try another choice.'};
+$('#pkr').onclick=e=>{const b=e.target.closest('[data-k]');if(b){cart[b.dataset.k]=(cart[b.dataset.k]||0)+1;drawCart();toast('Added to cart')}};
+$('#fs').onclick=async()=>{const m=$('#fm');try{const s=await navigator.mediaDevices.getUserMedia({video:true}),v=$('#fv');v.srcObject=s;v.style.display='block';m.textContent='Scanning…';setTimeout(()=>{s.getTracks().forEach(t=>t.stop());v.style.display='none';m.innerHTML='Welcome back, Aarav! Your usual is <b>Gongura chicken</b>. <button class="go" id="fa">Add it</button>';$('#fa').onclick=()=>{cart[0]=(cart[0]||0)+1;drawCart();toast('Added to cart')}},2500)}catch(e){m.textContent='Camera blocked. Allow camera access to try this.'}};
+$('#amenu').onclick=e=>{const b=e.target.closest('[data-o]');if(b){menu[b.dataset.o].off=!menu[b.dataset.o].off;drawMenu();drawAdmin()}};
+$('#af').onsubmit=e=>{e.preventDefault();menu.push({n:$('#an').value,p:+$('#ap2').value,c:'Mains',v:1,e:'🍽️',k:'Chef special'});e.target.reset();drawMenu();drawAdmin();toast('Dish added to the menu')};
+$('#rvf').onsubmit=e=>{e.preventDefault();const p=document.createElement('p');p.className='rev';p.textContent=$('#rvt').value+' – '+$('#rvn').value;$('#newrev').appendChild(p);e.target.reset();toast('Thanks for your review')};
+$('#nlf').onsubmit=e=>{e.preventDefault();e.target.reset();toast('Subscribed. Offers will reach your inbox')};
+$('#cu').onchange=e=>{cu=e.target.value;drawMenu()};
+
+// Customer account, wishlist, order history, kitchen and contact features
+let customer=null, customerAccounts={}, customerPoints=0;
+let loginEvents=[];
+try{customerAccounts=JSON.parse(localStorage.getItem('gtCustomerAccounts')||'{}');loginEvents=JSON.parse(localStorage.getItem('gtLoginEvents')||'[]')}catch(e){}
+function saveCustomerData(){try{const safeAccounts=Object.fromEntries(Object.entries(customerAccounts).map(([email,c])=>[email,{name:c.name,createdAt:c.createdAt||null}]));localStorage.setItem('gtCustomerAccounts',JSON.stringify(safeAccounts));localStorage.setItem('gtLoginEvents',JSON.stringify(loginEvents.slice(-100)))}catch(e){}}
+function logCustomerEvent(email,name,action){loginEvents.push({email,name,action,when:new Date().toLocaleString()});saveCustomerData()}
+$('#toggleGatePassword').onchange=e=>{$('#gatePassword').type=e.target.checked?'text':'password'};
+function openLoginGate(){const g=$('#loginGate');if(g){g.style.display='flex';document.body.classList.add('login-locked');setTimeout(()=>$('#gateName').focus(),30)}}
+function closeLoginGate(){const g=$('#loginGate');if(g)g.style.display='none';document.body.classList.remove('login-locked')}
+$('#gateForm').onsubmit=e=>{e.preventDefault();const name=$('#gateName').value.trim(),email=$('#gateEmail').value.trim().toLowerCase(),pass=$('#gatePassword').value;if(pass.length<4){$('#gateMessage').textContent='Please enter a password with at least 4 characters. Tick “Show password” to check what you typed.';return}let action='Login';if(!customerAccounts[email]){customerAccounts[email]={name,pass,createdAt:new Date().toISOString()};action='Sign up'}else{if(customerAccounts[email].pass&&customerAccounts[email].pass!==pass){$('#gateMessage').textContent='Incorrect password. Please try again.';return}if(!customerAccounts[email].name)customerAccounts[email].name=name}customer={name:customerAccounts[email].name||name,email};logCustomerEvent(email,customer.name,action);$('#accountState').textContent='Signed in: '+customer.name+' · '+pts+' loyalty points';$('#accountMsg').textContent='Welcome, '+customer.name+'!';closeLoginGate();toast('Login successful. Welcome to Globe Table!');};
+function drawWishlist(){const box=$('#wishlistItems');if(!box)return;box.innerHTML=wishlist.length?wishlist.map(i=>`<div class="card"><div style="font-size:34px">${menu[i].e}</div><b>${menu[i].n}</b><p>${fmt(menu[i].p)}</p><button class="go" data-wadd="${i}">Add to cart</button> <button class="alt" data-wremove="${i}">Remove</button></div>`).join(''):'<div class="card">No saved dishes yet. Tap Save on a menu item.</div>'}
+$('#wishlistItems').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.wadd!==undefined){const i=+b.dataset.wadd;cart[i]=(cart[i]||0)+1;drawCart();toast(menu[i].n+' added to cart')}if(b.dataset.wremove!==undefined){wishlist=wishlist.filter(i=>i!==+b.dataset.wremove);drawWishlist()}};
+function drawMyOrders(){const box=$('#myOrdersList');if(!box)return;box.innerHTML=orders.length?orders.slice().reverse().map(o=>`<div class="card"><div class="row"><b>Order #${o.id}</b><span class="pill">${stages[o.st]}</span></div><p>${o.items.join(', ')}</p><div class="row"><b>${fmt(o.amt)}</b><button class="alt" data-vieworder="${o.id}">Track order</button></div></div>`).join(''):'<div class="card">No orders yet. Your orders will appear here.</div>'}
+$('#myOrdersList').onclick=e=>{const b=e.target.closest('[data-vieworder]');if(b){mine=+b.dataset.vieworder;location.hash='track'}};
+function drawKitchen(){const box=$('#kitchenOrders');if(!box)return;box.innerHTML=orders.length?orders.map(o=>`<div class="card"><div class="row"><b>Order #${o.id}</b><span class="pill">${stages[o.st]}</span></div><p>${o.items.join('<br>')}</p><p>Spice: ${o.spice||'Medium'} · ${o.toppings||'No extra instructions'}</p><button class="go" data-kitchen="${o.id}" ${o.st>=3?'disabled':''}>${o.st>=3?'Completed':'Advance order status'}</button></div>`).join(''):'<div class="card">No incoming orders.</div>'}
+$('#kitchenOrders').onclick=e=>{const b=e.target.closest('[data-kitchen]');if(!b)return;const o=orders.find(x=>x.id===+b.dataset.kitchen);if(o&&o.st<3)o.st++;drawKitchen();drawAdmin();if(mine===o?.id)drawTrack()};
+$('#accountForm').onsubmit=e=>{e.preventDefault();const name=$('#accountName').value.trim(),email=$('#accountEmail').value.trim().toLowerCase(),pass=$('#accountPassword').value;let action='Login';if(customerAccounts[email]?.pass&&customerAccounts[email].pass!==pass){$('#accountMsg').textContent='That email already has an account. Check the password.';return}if(!customerAccounts[email]){customerAccounts[email]={name,pass,createdAt:new Date().toISOString()};action='Sign up'}customer={name:customerAccounts[email].name,email};logCustomerEvent(email,customer.name,action);$('#accountState').textContent='Signed in: '+customer.name+' · '+pts+' loyalty points';$('#accountMsg').textContent='Welcome, '+customer.name+'!';toast('Signed in successfully')};
+$('#accountLogout').onclick=()=>{if(customer)logCustomerEvent(customer.email,customer.name,'Logout');customer=null;$('#accountState').textContent='Guest mode';$('#accountMsg').textContent='You are signed out.';openLoginGate()};
+$('#contactForm').onsubmit=e=>{e.preventDefault();$('#contactMsg').textContent='Thank you. This demo form needs a server connection to send messages.';e.target.reset()};
+document.addEventListener('click',e=>{
+ if(e.target.id==='successDone'){const m=$('#orderSuccessModal');if(m)m.remove()}
+ if((e.target.id==='successDownload'||e.target.id==='successPrint')&&mine!==null){
+  const o=orders.find(x=>x.id===mine);if(!o)return;
+  const body=['GLOBE TABLE','ORDER PAYMENT RECEIPT','Order / Receipt: GT-'+o.id,'Date: '+new Date(o.createdAt).toLocaleString(),'Customer: '+o.name,'Phone: '+(o.phone||'-'),'Email: '+(o.email||'-'),'Billing name: '+(o.billName||o.name),'Billing address: '+(o.billAddr||o.addr),'GSTIN: '+(o.gstin||'Not provided'),'Items: '+o.items.join(', '),'Subtotal: '+fmt(o.subtotal),'GST (5%): '+fmt(o.gst),'Discount: '+fmt(o.discount),'Grand Total: '+fmt(o.amt),'Payment method: '+o.pay,'Thank you for ordering with Globe Table!'].join('\\n');
+  if(e.target.id==='successDownload'){const blob=new Blob([body],{type:'text/plain'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='GlobeTable-Bill-Receipt-'+o.id+'.txt';a.click();URL.revokeObjectURL(url)}
+  else{const r=$('#successReceipt');const w=window.open('','_blank','width=700,height=850');if(w&&r){w.document.write('<html><head><title>Globe Table Bill Receipt</title><style>body{font:15px Arial;padding:28px;color:#222}.row{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:7px 0}p{line-height:1.6}</style></head><body>'+r.innerHTML+'</body></html>');w.document.close();w.focus();w.print()}}
+ }
+ if(e.target.id==='invoiceBtn'&&mine!==null){const o=orders.find(x=>x.id===mine);if(!o)return;const body=['GLOBE TABLE','Arundelpet, Guntur','PAYMENT RECEIPT','Receipt: GT-'+o.id,'Date: '+new Date(o.createdAt).toLocaleString(),'Customer: '+o.name,'Phone: '+(o.phone||'-'),'Email: '+(o.email||'-'),'Billing name: '+(o.billName||o.name),'Billing address: '+(o.billAddr||o.addr),'GSTIN: '+(o.gstin||'Not provided'),'Items: '+o.items.join(', '),'Subtotal: '+fmt(o.subtotal??o.amt),'GST: '+fmt(o.gst||0),'Discount: '+fmt(o.discount||0),'Payment method: '+o.pay,'Total: '+fmt(o.amt),'Thank you!'].join('\n');const blob=new Blob([body],{type:'text/plain'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='GlobeTable-Invoice-'+o.id+'.txt';a.click();URL.revokeObjectURL(url)}
+ if(e.target.id==='printReceiptBtn'){const r=$('#receiptPreview');if(r){const w=window.open('','_blank','width=700,height=800');if(w){w.document.write('<html><head><title>Globe Table Receipt</title><style>body{font:15px Arial;padding:28px;color:#222}.row{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:7px 0}p{line-height:1.6}</style></head><body>'+r.innerHTML+'</body></html>');w.document.close();w.focus();w.print()}}}
+ if(e.target.id==='waOrderBtn'&&mine!==null){const o=orders.find(x=>x.id===mine);if(o)window.open('https://wa.me/?text='+encodeURIComponent('Please update me on order #'+o.id+'. Current status: '+stages[o.st]+'.'),'_blank','noopener')}
+});
+document.addEventListener('submit',e=>{if(e.target.id==='orderRating'){e.preventDefault();$('#ratingMsg').textContent='Thank you for your '+$('#orderStars').value+' star rating. Your feedback has been recorded in this demo.';toast('Rating submitted')}});
+
+let firstLanguageVisit=true;try{const saved=localStorage.getItem('globeTableLanguage');if(saved){lang=saved;firstLanguageVisit=localStorage.getItem('globeTableLanguageChosen')!=='1'}}catch(e){}
+$('#lg').value=lang;$('#welcomeLanguage').value=lang;document.documentElement.lang=lang;drawMenu();drawCart();route();tr();openLoginGate();
+if(firstLanguageVisit)$('#languageWelcome').classList.add('show');
+</script>
+</body>
+</html>
